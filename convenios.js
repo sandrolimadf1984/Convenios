@@ -51,7 +51,7 @@ var convenios=[
 {nome:"PASA VALE",validade:30,aceitaCopia:true,crm:true,crn:true,cro:true,coren:false,obs:"Aceita também RMS. Não aceita COREN."},
 {nome:"PETROBRAS",validade:180,aceitaCopia:true,crm:true,crn:true,cro:true,coren:false,obs:"Não aceita COREN."},
 {nome:"PF SAÚDE / POLÍCIA FEDERAL",validade:30,aceitaCopia:false,crm:true,crn:true,cro:true,coren:false,obs:"Não aceita COREN."},
-{nome:"PLAN ASSISTE / MPU",validade:null,aceitaCopia:true,crm:true,crn:true,cro:true,coren:false,obs:"Validade indeterminada. Não aceita COREN."},
+{nome:"PLAN ASSISTE / MPU",validade:null,aceitaCopia:false,crm:true,crn:true,cro:true,coren:false,obs:"Validade indeterminada. Não aceita COREN."},
 {nome:"PLENUM SAÚDE",validade:60,aceitaCopia:false,crm:true,crn:"parcial",cro:"parcial",coren:false,obs:"CRN e CRO com ressalvas. Aceita RMS. Não aceita COREN."},
 {nome:"POLÍCIA MILITAR",validade:null,aceitaCopia:false,crm:true,crn:true,cro:true,coren:true,obs:"Validade indeterminada. Aceita também RMS."},
 {nome:"PORTO SEGURO",validade:null,aceitaCopia:true,crm:true,crn:false,cro:true,coren:false,obs:"Validade indeterminada. Não aceita CRN e COREN."},
