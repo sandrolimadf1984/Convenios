@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificador de Convênios — Sabin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#e8f0fe,#f0f4f8);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card{background:#fff;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.13);max-width:560px;width:100%;overflow:hidden;}
+.header{background:linear-gradient(135deg,#1a4fa0,#1565c0);color:#fff;padding:28px 32px;text-align:center;}
+.icon{font-size:2.8rem;margin-bottom:10px;}
+h1{font-size:1.4rem;font-weight:800;}
+.header p{font-size:0.9rem;opacity:0.85;margin-top:6px;}
+.body{padding:32px;}
+.step{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;}
+.num{background:#1a4fa0;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.95rem;flex-shrink:0;margin-top:2px;}
+.step h3{font-size:1rem;font-weight:700;color:#1a2a4a;margin-bottom:4px;}
+.step p{font-size:0.88rem;color:#555;line-height:1.5;}
+.drag-area{background:linear-gradient(135deg,#f0f4f8,#e8f0fe);border:2px dashed #1a4fa0;border-radius:14px;padding:28px;text-align:center;margin:12px 0 0;}
+.drag-area p{font-size:0.82rem;color:#666;margin-bottom:16px;}
+.bm{display:inline-block;background:linear-gradient(135deg,#1a4fa0,#1565c0);color:#fff!important;padding:14px 28px;border-radius:12px;font-size:1rem;font-weight:700;text-decoration:none!important;cursor:grab;box-shadow:0 4px 16px rgba(26,79,160,0.35);user-select:none;}
+.hint{margin-top:12px;font-size:0.8rem;color:#888;}
+.demo{background:#f7f9fc;border-radius:10px;padding:14px 18px;font-size:0.85rem;color:#444;border-left:4px solid #43a047;margin-top:12px;line-height:1.6;}
+.demo b{color:#1b5e20;}
+.divider{height:1px;background:#eee;margin:4px 0 24px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="icon">📋</div>
+    <h1>Verificador de Convênios</h1>
+    <p>Instale em 1 minuto · Sabin Brasília</p>
+  </div>
+  <div class="body">
+    <div class="step">
+      <div class="num">1</div>
+      <div>
+        <h3>Mostre a barra de favoritos</h3>
+        <p>Pressione <b>Ctrl + Shift + B</b> no Chrome para exibir a barra de favoritos.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <div style="flex:1">
+        <h3>Arraste o botão para a barra de favoritos</h3>
+        <p>Segure o botão abaixo com o mouse e arraste até a barra no topo do Chrome.</p>
+        <div class="drag-area">
+          <p>⬇ Arraste este botão para a barra de favoritos ⬇</p>
+          <a class="bm" href="javascript:%28function%28%29%7Bvar%20s%3Ddocument.createElement%28%27script%27%29%3Bs.src%3D%27https%3A%2F%2Fsandrolimadf1984.github.io%2FConvenios%2Fconvenios2.js%3Fv%3D%27%2BDate.now%28%29%3Bdocument.head.appendChild%28s%29%3B%7D%29%28%29%3B">📋 Convênios</a>
+          <div class="hint">🖱️ Clique e segure → arraste para cima até a barra</div>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <div>
+        <h3>Pronto! Clique no favorito para usar</h3>
+        <p>Em qualquer página do Chrome, clique em <b>📋 Convênios</b> na barra.</p>
+        <div class="demo">
+          <b>✅ Como funciona:</b><br>
+          Clique no favorito → caixinha abre por cima de qualquer site<br>
+          Digite o convênio → veja validade e regras → informe a data<br>
+          Clique <b>Fechar</b> ou fora da caixa → some!
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="text-align:center;font-size:0.8rem;color:#aaa;">Desenvolvido para uso interno · Sabin Brasília</div>
+  </div>
+</div>
+</body>
+</html>
