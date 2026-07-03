@@ -14,7 +14,7 @@ var convenios=[
 {nome:"AFFEGO",validade:30,aceitaCopia:true,crm:true,crn:false,cro:false,coren:false,obs:"Não aceita CRN, CRO e COREN."},
 {nome:"AFEB",validade:30,aceitaCopia:true,crm:true,crn:false,cro:true,coren:false,obs:"Não aceita CRN e COREN."},
 {nome:"AGF ALLIANZ",validade:30,aceitaCopia:false,crm:true,crn:false,cro:false,coren:false,obs:"Não aceita CRN, CRO e COREN."},
-{nome:"AMIL",validade:90,aceitaCopia:true,crm:true,crn:false,cro:"parcial",coren:false,obs:"CRO somente para: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP, Hemo1."},
+{nome:"AMIL",validade:180,aceitaCopia:true,crm:true,crn:false,cro:"parcial",coren:false,obs:"CRO somente para: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP, Hemo1."},
 {nome:"ASSEFAZ",validade:60,aceitaCopia:false,crm:true,crn:true,cro:"parcial",coren:false,obs:"CRO aceito somente para Cirurgião-Dentista. Não aceita COREN."},
 {nome:"ASSEDF / VIDA CARD FIDELIDADE",validade:30,aceitaCopia:false,crm:true,crn:true,cro:true,coren:false,obs:"Não aceita COREN."},
 {nome:"BANCO CENTRAL",validade:60,aceitaCopia:true,crm:true,crn:true,cro:true,coren:false,obs:"Não aceita COREN."},
