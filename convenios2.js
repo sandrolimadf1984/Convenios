@@ -4,18 +4,22 @@ if(document.getElementById('cvOverlay')){document.getElementById('cvOverlay').st
 /* ============================================================
    BASE DE CONVÊNIOS
    ------------------------------------------------------------
-   validade   : número de dias | null (indeterminada) | 'sem'
-   aceitaCopia: true | false | 'parcial'
-   copiaObs   : texto que aparece quando é 'parcial'
-   aceita     : [{s:'CRM', d:'Médico', r:'texto da restrição'}]
-                (o campo r é opcional — quando existe aparece
-                 o botão "ver restrição")
-   naoAceita  : [{s:'CRN'}, {s:'COREN'}]
-   validadeTxt: (opcional) sobrescreve o título do banner
-   validadeSub: (opcional) sobrescreve o subtítulo do banner
-   anexos     : null  -> botão "Documentos anexos na Shift" desativado
-                {docs:[{n:'NOME DO DOC', o:'regra/observação'}],
-                 obs:'observação geral dos anexos',
+   validade   : dias (número) | null (indeterminada) | 'sem'
+   validadeTxt/validadeSub : (opcional) sobrescrevem o banner
+   aceitaCopia: true | false | 'parcial' | null
+   copiaObs   : (opcional) gera o botão "obs" ao lado do Pedido
+                Médico. Aceita texto simples OU {t:'',l:[],a:''}
+   aceita     : [{s:'CRM', d:'Médico', r:<ressalva>}]
+                r gera o botão "ver ressalva".
+                r aceita texto simples OU {t:'',l:[],a:''}
+                  t = texto introdutório
+                  l = lista de itens (um por linha)
+                  a = alerta em destaque vermelho
+   naoAceita  : [{s:'CRN'},{s:'COREN'}]
+   anexos     : null -> botão "Documentos anexos na Shift" off
+                {docs:[{n:'NOME DO DOC',
+                        ren:'COMO RENOMEAR',
+                        obs:<texto ou {t,l,a}>}],
                  faturamento:true  -> Guia enviada ao Faturamento
                  faturamento:false -> Guia fica na Unidade}
    obs        : observação geral do convênio
@@ -37,12 +41,16 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
 
 {nome:'AMIL',validade:180,aceitaCopia:true,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito desde que a indicação clínica seja compatível com a especialidade — exames pré-operatórios: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP e Hemo1. NÃO aceita pedido de CRO para COVID-19.'}],
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:{
+   t:'CRO aceito desde que a indicação clínica seja compatível com a especialidade.',
+   l:['Exames pré-operatórios aceitos: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP e Hemo1.'],
+   a:'NÃO aceita pedido de CRO para COVID-19.'}}],
  naoAceita:[{s:'CRN'},{s:'COREN'}],
  anexos:{docs:[
-   {n:'PEDIDO MÉDICO',o:'Renomear: PM NOMEDOPACIENTECOMPLETO NºGUIA'},
+   {n:'PEDIDO MÉDICO',ren:'PM NOMEDOPACIENTECOMPLETO NºGUIA',
+    obs:{t:'Havendo 2 ou mais pedidos médicos, renomear assim:',
+         l:['PM 1 NOMEDOPACIENTECOMPLETO NºGUIA','PM 2 NOMEDOPACIENTECOMPLETO NºGUIA','PM 3 NOMEDOPACIENTECOMPLETO NºGUIA']}},
    {n:'ELEGIBILIDADE'}],
-  obs:'2 ou mais pedidos médicos, renomear assim: PM 1 NOMEDOPACIENTECOMPLETO NºGUIA / PM 2 NOMEDOPACIENTECOMPLETO NºGUIA / PM 3 NOMEDOPACIENTECOMPLETO NºGUIA',
   faturamento:true}},
 
 {nome:'ASSEDF / VIDA CARD FIDELIDADE',validade:30,aceitaCopia:false,
@@ -61,9 +69,12 @@ var CONV=[
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
  naoAceita:[{s:'CRN'},{s:'COREN'}],
  anexos:{docs:[
-   {n:'PEDIDO MÉDICO',o:'Renomear: PM NOMEDOPACIENTECOMPLETO'},
-   {n:'CAPA BRADESCO',o:'Renomear: GU NOMEDOPACIENTECOMPLETO'}],
-  obs:'Obrigatório que pedido e capa estejam renomeados. Havendo mais de um pedido médico: PM NOMEDOPACIENTECOMPLETO / PM2 NOMEDOPACIENTECOMPLETO / PM3 NOMEDOPACIENTECOMPLETO',
+   {n:'PEDIDO MÉDICO',ren:'PM NOMEDOPACIENTECOMPLETO',
+    obs:{t:'Obrigatório que o pedido esteja renomeado. Havendo mais de um pedido médico:',
+         l:['PM  NOMEDOPACIENTECOMPLETO','PM2  NOMEDOPACIENTECOMPLETO','PM3  NOMEDOPACIENTECOMPLETO']}},
+   {n:'CAPA BRADESCO',ren:'GU NOMEDOPACIENTECOMPLETO',
+    obs:{t:'Obrigatório que a capa esteja renomeada:',
+         l:['GU  NOMEDOPACIENTECOMPLETO']}}],
   faturamento:false}},
 
 {nome:'BRASIL MED',validade:'sem',aceitaCopia:null,
@@ -71,12 +82,14 @@ var CONV=[
  obs:'Não há regras de pedido médico. O paciente traz e assina o encaminhamento.'},
 
 {nome:'BRB',validade:30,aceitaCopia:'parcial',
- copiaObs:'Cópia aceita com ressalvas.',
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito somente para os exames: HEM, GLI, HBGLI, URE, NA, K, TGO, TGP, GGT, BTF, PTF, CULTSEC, EAS, EPF, TC, TS e TAP.'}],
+ copiaObs:'Cópia de pedido médico aceita com ressalvas.',
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:{
+   t:'CRO aceito somente para os exames abaixo:',
+   l:['HEM, GLI, HBGLI, URE, NA, K, TGO, TGP, GGT, BTF, PTF, CULTSEC, EAS, EPF, TC, TS e TAP.']}}],
  naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
 
 {nome:'CAESAN',validade:90,aceitaCopia:'parcial',
- copiaObs:'Não aceita cópia de pedido externo — somente se o pedido for da própria Caesan.',
+ copiaObs:'Não aceita cópia de pedido externo. Só é aceita se o pedido for da própria Caesan.',
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
  naoAceita:[],anexos:null},
 
@@ -109,7 +122,7 @@ var CONV=[
 
 {nome:'CASSI PERIÓDICO',validade:'sem',
  validadeTxt:'Não aceitar encaminhamento vencido',
- validadeSub:'Verificar a validade da guia da Cassi.',
+ validadeSub:'Verificar sempre a validade da guia da Cassi.',
  aceitaCopia:null,aceita:[],naoAceita:[],
  anexos:{docs:[{n:'GUIA PERIÓDICO CASSI'}],faturamento:true},
  obs:'O beneficiário deve apresentar o encaminhamento da Cassi.'},
@@ -160,7 +173,8 @@ var CONV=[
  anexos:{docs:[
    {n:'PEDIDO MÉDICO'},
    {n:'ELEGIBILIDADE'},
-   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',o:'Documento com foto, frente e verso'}],
+   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',
+    obs:{t:'O documento pessoal precisa ser:',l:['Com foto','Frente e verso']}}],
   faturamento:true}},
 
 {nome:'HOSPITAL NAVAL / FUSMA',validade:30,aceitaCopia:true,
@@ -171,9 +185,12 @@ var CONV=[
  aceita:[{s:'CRM',d:'Médico'}],
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],
  anexos:{docs:[
-   {n:'PEDIDO MÉDICO',o:'Assinado conforme documento'},
-   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',o:'Assinado conforme documento'},
-   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',o:'Documento com foto, frente e verso. Se menor de idade, anexar também a documentação do responsável.'}],
+   {n:'PEDIDO MÉDICO',obs:'Assinado conforme documento.'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',obs:'Assinado conforme documento.'},
+   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',
+    obs:{t:'O documento pessoal precisa ser:',
+         l:['Com foto','Frente e verso'],
+         a:'Se for menor de idade, anexar também a documentação do responsável.'}}],
   faturamento:true}},
 
 {nome:'INTERMEDICA',validade:180,aceitaCopia:false,
@@ -181,7 +198,7 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
 
 {nome:'IPASGO',validade:null,aceitaCopia:'parcial',
- copiaObs:'Cópia aceita com ressalvas.',
+ copiaObs:'Cópia de pedido médico aceita com ressalvas.',
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
  naoAceita:[{s:'COREN'}],anexos:null},
 
@@ -204,7 +221,7 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
 
 {nome:'MEDSENIOR',validade:null,aceitaCopia:'parcial',
- copiaObs:'Cópia aceita com ressalvas.',
+ copiaObs:'Cópia de pedido médico aceita com ressalvas.',
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'}],
  naoAceita:[{s:'CRO'},{s:'COREN'}],anexos:null},
 
@@ -286,13 +303,28 @@ var CONV=[
  naoAceita:[{s:'COREN'}],anexos:null},
 
 {nome:'STF-MED',validade:60,aceitaCopia:true,
- copiaObs:'Aceita pedido impresso com complemento manuscrito, sem rasuras e com caneta da mesma cor da assinatura do médico.',
+ copiaObs:{t:'Aceita pedido médico impresso com complemento de solicitação de exames manuscritos, desde que:',
+           l:['Sem rasuras','Escrito com caneta da mesma cor da assinatura do médico']},
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},
-         {s:'CRN',d:'Nutricionista',r:'O CRN poderá solicitar apenas os seguintes exames laboratoriais: Hemograma completo; Proteínas totais e frações; Proteína ligadora de retinol; Triglicérides / colesterol total e frações; Glicemia, teste oral de tolerância à glicose, insulina, peptídeo C, hemoglobina glicada; Tiroxina total e livre, triiodotironina, globulina ligadora de tiroxina (TBG), TSH; Gasometria arterial; Ureia e creatinina; Sódio, cálcio total e iônico, potássio sérico, fósforo sérico, magnésio sérico; Ácido úrico, oxalato, citrato; TGO; TGP; GGT; Ferro sérico; Transferrina; Ferritina; Capacidade total de ligação do ferro; Vitamina B12; Ácido fólico; Vitamina D.'}],
+         {s:'CRN',d:'Nutricionista',r:{
+   t:'O CRN poderá solicitar apenas os seguintes exames laboratoriais:',
+   l:['Hemograma completo',
+      'Proteínas totais e frações',
+      'Proteína ligadora de retinol',
+      'Triglicérides, colesterol total e frações',
+      'Glicemia, teste oral de tolerância à glicose, insulina, peptídeo C e hemoglobina glicada',
+      'Tiroxina total e livre, triiodotironina, globulina ligadora de tiroxina (TBG) e TSH',
+      'Gasometria arterial',
+      'Ureia e creatinina',
+      'Sódio, cálcio total e iônico, potássio sérico, fósforo sérico e magnésio sérico',
+      'Ácido úrico, oxalato e citrato',
+      'TGO, TGP e GGT',
+      'Ferro sérico, transferrina, ferritina e capacidade total de ligação do ferro',
+      'Vitamina B12, ácido fólico e vitamina D']}}],
  naoAceita:[{s:'COREN'}],
  anexos:{docs:[
    {n:'PEDIDO MÉDICO'},
-   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',o:'Somente se houver autorização que alerta na Shift'}],
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',obs:'Anexar somente se houver autorização que alerta na Shift.'}],
   faturamento:true}},
 
 {nome:'STJ',validade:null,aceitaCopia:true,
@@ -368,7 +400,6 @@ IC.reset='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 IC.info='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.4"/><path d="M12 11.4v5.2M12 7.8h.01"/></svg>';
 IC.chev='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5l6 6 6-6"/></svg>';
 IC.files='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2.6H6.8a2 2 0 0 0-2 2v14.8a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2V7.6z"/><path d="M14.5 2.6v5h4.7M8.4 12.4h7M8.4 16h4.6"/></svg>';
-IC.layers='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l9.2 4.7L12 12 2.8 7.3z"/><path d="M2.8 12.2L12 16.9l9.2-4.7M2.8 16.9L12 21.6l9.2-4.7"/></svg>';
 IC.warn='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.6L1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><path d="M12 9.2v4.4M12 17.4h.01"/></svg>';
 
 /* ============================================================
@@ -380,25 +411,18 @@ var CSS=''
 +'#cvOverlay svg{width:1em;height:1em;display:block;}'
 +'#cvBox{position:relative;width:100%;max-width:470px;background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.42);overflow:hidden;animation:cvUp .22s ease;}'
 +'@keyframes cvUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}'
-
-/* aviso */
 +'#cvAviso{display:none;background:#ffcf3d;color:#3a2c00;padding:12px 34px 12px 14px;font-size:12.5px;line-height:1.5;position:relative;border-bottom:1px solid #d9a800;}'
 +'#cvAviso.on{display:block;}'
 +'#cvAviso b{display:flex;align-items:center;gap:6px;font-size:12.5px;margin-bottom:3px;}'
 +'#cvAviso b svg{font-size:14px;}'
 +'#cvAvisoX{position:absolute;top:7px;right:9px;background:none;border:0;color:#3a2c00;font-size:16px;line-height:1;cursor:pointer;font-weight:700;}'
-
-/* header */
 +'#cvOverlay .cv-head{background:linear-gradient(120deg,#1b52ad 0%,#1668ce 55%,#1877d8 100%);padding:17px 18px;display:flex;align-items:center;gap:13px;position:relative;overflow:hidden;}'
 +'#cvOverlay .cv-hbadge{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:23px;flex:0 0 auto;}'
 +'#cvOverlay .cv-htxt{flex:1;min-width:0;}'
 +'#cvOverlay .cv-htxt h1{font-size:16.5px;font-weight:800;color:#fff;letter-spacing:.6px;line-height:1.2;}'
 +'#cvOverlay .cv-htxt p{font-size:11px;color:rgba(255,255,255,.82);margin-top:3px;line-height:1.35;}'
 +'#cvOverlay .cv-hart{flex:0 0 auto;display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.55);}'
-+'#cvOverlay .cv-hart .a1{font-size:27px;}'
-+'#cvOverlay .cv-hart .a2{font-size:22px;}'
-
-/* corpo */
++'#cvOverlay .cv-hart .a1{font-size:27px;}#cvOverlay .cv-hart .a2{font-size:22px;}'
 +'#cvOverlay .cv-body{padding:16px 18px 18px;}'
 +'#cvOverlay .cv-lbl{font-size:10.5px;font-weight:700;color:#8b93a4;letter-spacing:.4px;margin-bottom:5px;display:block;}'
 +'#cvOverlay .cv-inwrap{position:relative;}'
@@ -412,8 +436,6 @@ var CSS=''
 +'#cvOverlay .cv-item:last-child{border-bottom:0;}'
 +'#cvOverlay .cv-item:hover{background:#eaf2fd;color:#1152a8;}'
 +'#cvOverlay .cv-vazio{padding:12px 14px;font-size:12.5px;color:#98a2b3;}'
-
-/* banner validade */
 +'#cvOverlay .cv-val{display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px 15px;border-radius:13px;background:linear-gradient(96deg,#e9f8ec,#f2fbf3);border:1.4px solid #b9e5c3;}'
 +'#cvOverlay .cv-val .vi{font-size:24px;color:#1f8a3c;flex:0 0 auto;}'
 +'#cvOverlay .cv-val .vt{flex:1;min-width:0;}'
@@ -426,8 +448,6 @@ var CSS=''
 +'#cvOverlay .cv-val.sem{background:linear-gradient(96deg,#eceff4,#f4f6fa);border-color:#c9d2e0;}'
 +'#cvOverlay .cv-val.sem .vi{color:#4c5a72;}#cvOverlay .cv-val.sem .vt h2{color:#33405a;}'
 +'#cvOverlay .cv-val.sem .vt p{color:#6a768c;}#cvOverlay .cv-val.sem .vs{color:#a9b4c6;}'
-
-/* cards */
 +'#cvOverlay .cv-card{display:flex;align-items:stretch;gap:11px;margin-top:10px;padding:11px;border:1.4px solid #dde4ee;border-radius:14px;background:#fff;}'
 +'#cvOverlay .cv-cl{display:flex;align-items:center;gap:9px;flex:0 0 auto;width:132px;}'
 +'#cvOverlay .cv-cl.solo{width:66px;justify-content:center;}'
@@ -435,47 +455,34 @@ var CSS=''
 +'#cvOverlay .cv-cl h3{font-size:12.5px;font-weight:800;color:#22304c;line-height:1.2;}'
 +'#cvOverlay .cv-cl span{font-size:9.5px;color:#8b93a4;line-height:1.3;display:block;margin-top:2px;}'
 +'#cvOverlay .cv-cr{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;justify-content:center;}'
-
-/* pílulas verde/vermelho */
 +'#cvOverlay .cv-pill{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;}'
 +'#cvOverlay .cv-pill.ok{background:#eaf8ee;border:1.3px solid #b7e5c4;}'
 +'#cvOverlay .cv-pill.no{background:#fdecef;border:1.3px solid #f6c3cc;}'
 +'#cvOverlay .cv-pill .b{width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex:0 0 auto;}'
-+'#cvOverlay .cv-pill.ok .b{background:#20a145;}'
-+'#cvOverlay .cv-pill.no .b{background:#e0364f;}'
++'#cvOverlay .cv-pill.ok .b{background:#20a145;}#cvOverlay .cv-pill.no .b{background:#e0364f;}'
 +'#cvOverlay .cv-pill .t{flex:1;min-width:0;}'
-+'#cvOverlay .cv-pill .t strong{display:block;font-size:12.5px;font-weight:800;line-height:1.25;}'
++'#cvOverlay .cv-pill .t strong{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12.5px;font-weight:800;line-height:1.25;}'
 +'#cvOverlay .cv-pill .t em{display:block;font-style:normal;font-size:9.5px;margin-top:2px;opacity:.82;}'
-+'#cvOverlay .cv-pill.ok .t{color:#177a34;}'
-+'#cvOverlay .cv-pill.no .t{color:#c0273e;}'
-
-/* linha de especialidades */
++'#cvOverlay .cv-pill.ok .t{color:#177a34;}#cvOverlay .cv-pill.no .t{color:#c0273e;}'
 +'#cvOverlay .cv-esp{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:11px;}'
 +'#cvOverlay .cv-esp.ok{background:#eaf8ee;border:1.3px solid #b7e5c4;}'
 +'#cvOverlay .cv-esp.no{background:#fdecef;border:1.3px solid #f6c3cc;}'
 +'#cvOverlay .cv-esp .b{width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex:0 0 auto;margin-top:1px;}'
 +'#cvOverlay .cv-esp.ok .b{background:#20a145;}#cvOverlay .cv-esp.no .b{background:#e0364f;}'
-+'#cvOverlay .cv-esp .k{font-size:12.5px;font-weight:800;flex:0 0 auto;padding-top:3px;}'
-+'#cvOverlay .cv-esp .k{color:#1a1a1a;}'
++'#cvOverlay .cv-esp .k{font-size:12.5px;font-weight:800;flex:0 0 auto;padding-top:3px;color:#1a1a1a;}'
 +'#cvOverlay .cv-esp .lst{flex:1;min-width:0;border-left:1.3px solid rgba(0,0,0,.09);padding-left:9px;display:flex;flex-direction:column;gap:3px;}'
 +'#cvOverlay .cv-sig{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;font-weight:800;line-height:1.3;}'
 +'#cvOverlay .cv-esp.ok .cv-sig{color:#177a34;}#cvOverlay .cv-esp.no .cv-sig{color:#c0273e;}'
 +'#cvOverlay .cv-sig i{font-style:normal;font-weight:500;font-size:10.5px;opacity:.78;}'
-+'#cvOverlay .cv-rbtn{border:1.2px solid #e79a1f;background:#fff5e0;color:#a8690a;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:20px;cursor:pointer;font-family:inherit;letter-spacing:.2px;white-space:nowrap;}'
++'#cvOverlay .cv-rbtn{border:1.2px solid #e79a1f;background:#fff5e0;color:#a8690a;font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:20px;cursor:pointer;font-family:inherit;letter-spacing:.2px;white-space:nowrap;}'
 +'#cvOverlay .cv-rbtn:hover{background:#ffe9c2;}'
 +'#cvOverlay .cv-nada{font-size:11px;color:#98a2b3;font-style:italic;padding-top:3px;}'
-
-/* botão anexos */
 +'#cvOverlay .cv-anx{display:flex;align-items:center;justify-content:center;gap:9px;margin:12px auto 0;padding:11px 20px;border-radius:30px;background:linear-gradient(180deg,#f4f6fa,#e7ecf4);border:1.5px solid #ccd6e6;color:#2b3852;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 2px 5px rgba(20,40,80,.07);transition:.15s;}'
 +'#cvOverlay .cv-anx:hover:not(:disabled){background:linear-gradient(180deg,#eaf1fb,#d9e5f6);border-color:#9dbbe4;}'
 +'#cvOverlay .cv-anx:disabled{opacity:.45;cursor:not-allowed;}'
 +'#cvOverlay .cv-anx .ci{width:26px;height:26px;border-radius:50%;background:#fff;border:1.3px solid #ccd6e6;display:flex;align-items:center;justify-content:center;font-size:13px;color:#5b6880;}'
-
-/* observação geral */
 +'#cvOverlay .cv-obs{margin-top:11px;padding:10px 12px;border-radius:11px;background:#fff8e6;border-left:4px solid #eea93a;font-size:11.5px;color:#7a5a11;line-height:1.5;display:none;}'
 +'#cvOverlay .cv-obs.on{display:block;}'
-
-/* divisor / calculadora */
 +'#cvOverlay .cv-hr{height:1px;background:#e6ebf3;margin:15px 0 13px;}'
 +'#cvOverlay .cv-calch{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:#1152a8;margin-bottom:10px;}'
 +'#cvOverlay .cv-calch .ci{width:24px;height:24px;border-radius:7px;background:#eaf2fd;display:flex;align-items:center;justify-content:center;font-size:14px;}'
@@ -484,8 +491,6 @@ var CSS=''
 +'#cvOverlay .cv-dlbl svg{font-size:15px;color:#c0392b;}'
 +'#cvOverlay .cv-date{flex:1;padding:10px 12px;border:1.6px solid #ccd6e6;border-radius:11px;font-size:13.5px;font-weight:600;color:#17264a;outline:none;font-family:inherit;background:#fff;}'
 +'#cvOverlay .cv-date:focus{border-color:#1668ce;box-shadow:0 0 0 3px rgba(22,104,206,.13);}'
-
-/* resultado da validade */
 +'#cvOverlay .cv-res{display:none;margin-top:11px;}'
 +'#cvOverlay .cv-res.on{display:block;}'
 +'#cvOverlay .cv-resrow{display:flex;align-items:center;gap:9px;}'
@@ -498,8 +503,6 @@ var CSS=''
 +'#cvOverlay .cv-dbox{flex:1;padding:9px 12px;border-radius:11px;background:#f2f6fb;border:1.3px solid #e0e8f3;}'
 +'#cvOverlay .cv-dbox span{display:block;font-size:9.5px;font-weight:700;color:#8b93a4;letter-spacing:.2px;}'
 +'#cvOverlay .cv-dbox strong{display:block;font-size:14px;font-weight:800;color:#1152a8;margin-top:2px;}'
-
-/* botões */
 +'#cvOverlay .cv-acts{display:flex;gap:10px;margin-top:15px;}'
 +'#cvOverlay .cv-b{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 10px;border:0;border-radius:12px;color:#fff;font-size:13px;font-weight:800;letter-spacing:.4px;cursor:pointer;font-family:inherit;transition:.12s;}'
 +'#cvOverlay .cv-b small{font-weight:500;font-size:9.5px;opacity:.85;letter-spacing:0;}'
@@ -508,47 +511,56 @@ var CSS=''
 +'#cvOverlay .cv-b.f{background:linear-gradient(135deg,#e0364f,#c0273e);box-shadow:0 4px 12px rgba(224,54,79,.3);}'
 +'#cvOverlay .cv-b.r:hover{background:linear-gradient(135deg,#1877d8,#2a8ae8);}'
 +'#cvOverlay .cv-b.f:hover{background:linear-gradient(135deg,#c0273e,#a01a30);}'
-
-/* rodapé */
 +'#cvOverlay .cv-foot{display:flex;align-items:center;gap:9px;margin-top:13px;padding:10px 12px;border-radius:11px;background:#f6f9fd;border:1.2px solid #e3eaf4;}'
 +'#cvOverlay .cv-foot .fi{font-size:16px;color:#1668ce;flex:0 0 auto;}'
 +'#cvOverlay .cv-foot p{flex:1;font-size:9.8px;color:#7d879b;line-height:1.5;}'
 +'#cvOverlay .cv-foot .fs{font-size:16px;color:#9dbbe4;flex:0 0 auto;}'
 +'#cvOverlay .cv-cred{text-align:right;margin-top:9px;padding-right:2px;font-size:11.5px;font-weight:800;color:#a08a45;letter-spacing:.2px;}'
 
-/* modais */
+/* ---- MODAIS ---- */
 +'#cvOverlay .cv-mod{position:absolute;inset:0;background:rgba(15,25,45,.5);display:none;align-items:center;justify-content:center;padding:18px;border-radius:22px;}'
 +'#cvOverlay .cv-mod.on{display:flex;}'
-+'#cvOverlay .cv-mbox{width:100%;max-width:390px;max-height:100%;overflow-y:auto;background:#fff;border-radius:15px;box-shadow:0 18px 46px rgba(0,0,0,.35);}'
-+'#cvOverlay .cv-mhead{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1.4px solid #e6ebf3;}'
++'#cvOverlay .cv-mbox{width:100%;max-width:400px;max-height:100%;overflow-y:auto;background:#fff;border-radius:15px;box-shadow:0 18px 46px rgba(0,0,0,.35);}'
++'#cvOverlay .cv-mhead{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1.4px solid #e6ebf3;position:sticky;top:0;background:#fff;border-radius:15px 15px 0 0;}'
 +'#cvOverlay .cv-mhead h3{flex:1;font-size:13.5px;font-weight:800;color:#22304c;}'
 +'#cvOverlay .cv-mx{background:none;border:0;color:#8b93a4;font-size:19px;line-height:1;cursor:pointer;font-family:inherit;padding:0 2px;}'
 +'#cvOverlay .cv-mx:hover{color:#e0364f;}'
 +'#cvOverlay .cv-mbody{padding:14px 15px;}'
-+'#cvOverlay .cv-sect{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#22304c;margin-bottom:8px;}'
++'#cvOverlay .cv-sect{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#22304c;margin-bottom:10px;}'
 +'#cvOverlay .cv-sect svg{font-size:15px;color:#1668ce;}'
-+'#cvOverlay .cv-file{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1.4px solid #dde4ee;border-radius:9px;background:#fbfcfe;font-size:12px;font-weight:600;color:#2b3852;margin-bottom:6px;}'
-+'#cvOverlay .cv-file span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}'
-+'#cvOverlay .cv-file svg{font-size:14px;color:#7d879b;flex:0 0 auto;}'
-+'#cvOverlay .cv-note{font-size:9.8px;color:#8b93a4;line-height:1.5;margin:5px 0 14px;font-style:italic;}'
-+'#cvOverlay .cv-fat{padding:10px 12px;border-radius:10px;font-size:12px;font-weight:800;text-align:center;margin-bottom:13px;}'
+
+/* barra roxa do documento */
++'#cvOverlay .cv-docbar{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1.4px solid #b9a9e6;border-radius:9px;background:#ded6f5;font-size:13px;font-weight:800;color:#382c63;letter-spacing:.2px;}'
++'#cvOverlay .cv-docbar span{flex:1;min-width:0;}'
++'#cvOverlay .cv-docbar svg{font-size:15px;color:#6b5aa6;flex:0 0 auto;}'
++'#cvOverlay .cv-ren{font-size:9.8px;color:#8b93a4;font-style:italic;margin:4px 0 0 3px;letter-spacing:.1px;}'
++'#cvOverlay .cv-ren b{color:#5b6880;font-style:normal;font-weight:700;}'
+
+/* caixa amarela de observação do documento */
++'#cvOverlay .cv-dobs{margin:7px 0 0 3px;padding:10px 13px;border-left:4px solid #eea93a;border-radius:0 9px 9px 0;background:#fdf6e3;}'
++'#cvOverlay .cv-dobs p{font-size:11.3px;color:#6b5320;line-height:1.55;}'
++'#cvOverlay .cv-dobs ul{list-style:none;margin:6px 0 0 0;padding:0;}'
++'#cvOverlay .cv-dobs li{font-size:11.5px;color:#4a3a12;font-weight:700;line-height:1.75;padding-left:12px;position:relative;letter-spacing:.2px;}'
++'#cvOverlay .cv-dobs li:before{content:"";position:absolute;left:1px;top:9px;width:4px;height:4px;border-radius:50%;background:#c9922a;}'
++'#cvOverlay .cv-dobs .al{margin-top:8px;padding:7px 10px;border-radius:7px;background:#fdecef;color:#a01a30;font-size:11px;font-weight:700;line-height:1.5;}'
++'#cvOverlay .cv-docwrap{margin-bottom:14px;}'
++'#cvOverlay .cv-fat{padding:11px 12px;border-radius:10px;font-size:12.5px;font-weight:800;text-align:center;margin:4px 0 13px;}'
 +'#cvOverlay .cv-fat.sim{background:#eaf8ee;color:#15662d;border:1.4px solid #b7e5c4;}'
 +'#cvOverlay .cv-fat.nao{background:#fdecef;color:#a01a30;border:1.4px solid #f6c3cc;}'
 +'#cvOverlay .cv-macts{display:flex;gap:9px;}'
-+'#cvOverlay .cv-mb{flex:1;padding:10px;border:0;border-radius:9px;color:#fff;font-size:12px;font-weight:800;letter-spacing:.4px;cursor:pointer;font-family:inherit;}'
++'#cvOverlay .cv-mb{flex:1;padding:11px;border:0;border-radius:9px;color:#fff;font-size:12px;font-weight:800;letter-spacing:.6px;cursor:pointer;font-family:inherit;}'
 +'#cvOverlay .cv-mb.ret{background:#1b3f7a;}#cvOverlay .cv-mb.ret:hover{background:#12305f;}'
 +'#cvOverlay .cv-mb.fec{background:#8e1d2c;}#cvOverlay .cv-mb.fec:hover{background:#6f1521;}'
-+'#cvOverlay .cv-rtxt{font-size:12.5px;color:#3c4a66;line-height:1.6;padding:11px 13px;border-radius:10px;background:#fff8e6;border-left:4px solid #eea93a;margin-bottom:13px;}'
++'#cvOverlay .cv-vazioanx{font-size:11.5px;color:#98a2b3;font-style:italic;padding:12px;text-align:center;border:1.4px dashed #d5dde9;border-radius:9px;margin-bottom:14px;}'
 ;
 
 /* ============================================================
    MONTAGEM
    ============================================================ */
 var st=document.createElement('style');st.id='cvStyle';st.textContent=CSS;document.head.appendChild(st);
-
 var ov=document.createElement('div');ov.id='cvOverlay';
 
-var H=''
+ov.innerHTML=''
 +'<div id="cvBox">'
 +' <div id="cvAviso"><button id="cvAvisoX">&times;</button><b>'+IC.warn+' ATENÇÃO</b><span id="cvAvisoT"></span></div>'
 +' <div class="cv-head">'
@@ -563,7 +575,7 @@ var H=''
 +'   <div id="cvRes" style="display:none">'
 +'     <div class="cv-val" id="cvVal"><div class="vi">'+IC.calCheck+'</div><div class="vt"><h2 id="cvValT"></h2><p id="cvValS"></p></div><div class="vs">'+IC.shield+'</div></div>'
 +'     <div class="cv-card"><div class="cv-cl"><div class="cv-av">'+IC.doc+'</div><div><h3>Pedido Médico</h3><span>Aceitação de cópia de pedido médico</span></div></div><div class="cv-cr" id="cvCopia"></div></div>'
-+'     <div class="cv-card"><div class="cv-cl solo"><div class="cv-av">'+IC.doctor+'</div></div><div class="cv-cr" id="cvEsp"></div></div>'
++'     <div class="cv-card" id="cvCardEsp"><div class="cv-cl solo"><div class="cv-av">'+IC.doctor+'</div></div><div class="cv-cr" id="cvEsp"></div></div>'
 +'     <button class="cv-anx" id="cvAnx"><span class="ci">'+IC.paperclip+'</span>Documentos anexos na Shift</button>'
 +'     <div class="cv-obs" id="cvObs"></div>'
 +'   </div>'
@@ -583,16 +595,27 @@ var H=''
 +'   <div class="cv-mbody" id="cvModABody"></div>'
 +' </div></div>'
 +' <div class="cv-mod" id="cvModR"><div class="cv-mbox">'
-+'   <div class="cv-mhead"><h3 id="cvModRTit">Restrição</h3><button class="cv-mx" id="cvModRX">&times;</button></div>'
-+'   <div class="cv-mbody"><div class="cv-rtxt" id="cvModRTxt"></div><div class="cv-macts"><button class="cv-mb ret" id="cvModRRet">RETORNAR</button></div></div>'
++'   <div class="cv-mhead"><h3 id="cvModRTit">Ressalva</h3><button class="cv-mx" id="cvModRX">&times;</button></div>'
++'   <div class="cv-mbody"><div id="cvModRTxt"></div><div class="cv-macts" style="margin-top:13px"><button class="cv-mb ret" id="cvModRRet">RETORNAR</button></div></div>'
 +' </div></div>'
 +'</div>';
 
-ov.innerHTML=H;
 document.body.appendChild(ov);
-
 var $=function(i){return document.getElementById(i);};
 var atual=null;
+
+/* ---------- helper: monta texto simples ou {t,l,a} ---------- */
+function bloco(o){
+  if(!o)return '';
+  var h='<div class="cv-dobs">';
+  if(typeof o==='string'){h+='<p>'+o+'</p>';}
+  else{
+    if(o.t)h+='<p>'+o.t+'</p>';
+    if(o.l&&o.l.length){h+='<ul>';for(var i=0;i<o.l.length;i++){h+='<li>'+o.l[i]+'</li>';}h+='</ul>';}
+    if(o.a)h+='<div class="al">'+o.a+'</div>';
+  }
+  return h+'</div>';
+}
 
 /* ---------- fechar ---------- */
 function fechar(){var o=$('cvOverlay');if(o)o.remove();var s=$('cvStyle');if(s)s.remove();}
@@ -635,21 +658,24 @@ document.addEventListener('click',function(e){
   if(!drop.contains(e.target)&&e.target!==inp)drop.className='cv-drop';
 });
 
-/* ---------- render ---------- */
 function selecionar(nome){
   var c=null;
   for(var i=0;i<CONV.length;i++){if(CONV[i].nome===nome){c=CONV[i];break;}}
   if(!c)return;
-  atual=c;
-  inp.value=c.nome;
-  drop.className='cv-drop';
-  render(c);
+  atual=c;inp.value=c.nome;drop.className='cv-drop';render(c);
 }
 
+/* ---------- abre o modal de ressalva/obs ---------- */
+function abrirRessalva(titulo,conteudo){
+  $('cvModRTit').textContent=titulo;
+  $('cvModRTxt').innerHTML=bloco(conteudo);
+  $('cvModR').className='cv-mod on';
+}
+
+/* ---------- render ---------- */
 function render(c){
   $('cvRes').style.display='block';
 
-  /* validade */
   var vb=$('cvVal'),vt=$('cvValT'),vs=$('cvValS');
   if(c.validade==='sem'){
     vb.className='cv-val sem';
@@ -665,86 +691,85 @@ function render(c){
     vs.textContent='Regras do pedido médico para '+c.nome+'.';
   }
 
-  /* cópia */
-  var cx=$('cvCopia'),ch='';
+  /* --- cópia de pedido médico --- */
+  var cx=$('cvCopia'),ch='',btnObs=c.copiaObs?'<button class="cv-rbtn" id="cvBtnCopiaObs">obs</button>':'';
   if(c.aceitaCopia===true){
-    ch='<div class="cv-pill ok"><span class="b">'+IC.check+'</span><span class="t"><strong>Aceita cópia de pedido médico</strong><em>Cópia de pedido médico permitida</em></span></div>';
+    ch='<div class="cv-pill ok"><span class="b">'+IC.check+'</span><span class="t"><strong>Aceita cópia de pedido médico'+btnObs+'</strong><em>Cópia de pedido médico permitida</em></span></div>';
   }else if(c.aceitaCopia===false){
-    ch='<div class="cv-pill no"><span class="b">'+IC.x+'</span><span class="t"><strong>Não aceita cópia de pedido médico</strong><em>Cópia de pedido médico não permitida</em></span></div>';
+    ch='<div class="cv-pill no"><span class="b">'+IC.x+'</span><span class="t"><strong>Não aceita cópia de pedido médico'+btnObs+'</strong><em>Cópia de pedido médico não permitida</em></span></div>';
   }else if(c.aceitaCopia==='parcial'){
-    ch='<div class="cv-pill ok"><span class="b">'+IC.check+'</span><span class="t"><strong>Aceita cópia com ressalvas</strong><em>'+(c.copiaObs||'Consulte a regra do convênio')+'</em></span></div>';
+    ch='<div class="cv-pill ok"><span class="b">'+IC.check+'</span><span class="t"><strong>Aceita cópia com ressalvas'+btnObs+'</strong><em>Cópia permitida sob condições</em></span></div>';
   }else{
-    ch='<div class="cv-pill no"><span class="b">'+IC.x+'</span><span class="t"><strong>Sem regra definida</strong><em>Consulte a observação abaixo</em></span></div>';
+    ch='<div class="cv-pill no"><span class="b">'+IC.x+'</span><span class="t"><strong>Sem regra definida'+btnObs+'</strong><em>Consulte a observação abaixo</em></span></div>';
   }
   cx.innerHTML=ch;
+  if(c.copiaObs){
+    $('cvBtnCopiaObs').addEventListener('click',function(){
+      abrirRessalva('Observação — Pedido Médico',atual.copiaObs);
+    });
+  }
 
-  /* especialidades */
+  /* --- especialidades --- */
   var ex=$('cvEsp'),eh='';
   var ac=c.aceita||[],na=c.naoAceita||[];
-
   if(ac.length){
     eh+='<div class="cv-esp ok"><span class="b">'+IC.check+'</span><span class="k">Aceita</span><span class="lst">';
     for(var i=0;i<ac.length;i++){
       eh+='<span class="cv-sig">'+ac[i].s+' <i>('+ac[i].d+')</i>';
-      if(ac[i].r){eh+='<button class="cv-rbtn" data-r="'+i+'">ver restrição</button>';}
+      if(ac[i].r)eh+='<button class="cv-rbtn" data-r="'+i+'">ver ressalva</button>';
       eh+='</span>';
     }
     eh+='</span></div>';
   }
   if(na.length){
-    eh+='<div class="cv-esp no"><span class="b">'+IC.x+'</span><span class="k">Não aceita</span><span class="lst"><span class="cv-sig">';
     var ns=[];for(var j=0;j<na.length;j++){ns.push(na[j].s);}
-    eh+=ns.join(', ')+'</span></span></div>';
+    eh+='<div class="cv-esp no"><span class="b">'+IC.x+'</span><span class="k">Não aceita</span><span class="lst"><span class="cv-sig">'+ns.join(', ')+'</span></span></div>';
   }else if(ac.length){
     eh+='<div class="cv-esp no"><span class="b">'+IC.x+'</span><span class="k">Não aceita</span><span class="lst"><span class="cv-nada">Aceita todas as especialidades</span></span></div>';
   }
   ex.innerHTML=eh;
-  ex.parentNode.style.display=(ac.length||na.length)?'flex':'none';
+  $('cvCardEsp').style.display=(ac.length||na.length)?'flex':'none';
 
   var rb=ex.querySelectorAll('.cv-rbtn');
   for(var m=0;m<rb.length;m++){
     rb[m].addEventListener('click',function(){
       var it=atual.aceita[parseInt(this.getAttribute('data-r'),10)];
-      $('cvModRTit').textContent='Restrição — '+it.s;
-      $('cvModRTxt').textContent=it.r;
-      $('cvModR').className='cv-mod on';
+      abrirRessalva('Ressalva — '+it.s+' ('+it.d+')',it.r);
     });
   }
 
-  /* anexos */
   $('cvAnx').disabled=!c.anexos;
 
-  /* observação */
   var ob=$('cvObs');
-  if(c.obs){ob.textContent=c.obs;ob.className='cv-obs on';}
+  if(c.obs){ob.textContent='📌 '+c.obs;ob.className='cv-obs on';}
   else{ob.className='cv-obs';ob.textContent='';}
 
-  /* limpa calculadora */
   $('cvDate').value='';
   $('cvCalcRes').className='cv-res';
 }
 
-/* ---------- modal anexos ---------- */
+/* ---------- modal de anexos ---------- */
 $('cvAnx').addEventListener('click',function(){
   if(!atual||!atual.anexos)return;
   var a=atual.anexos,h='';
   $('cvModATit').textContent='Gerenciador de Documentos da Shift';
+  h+='<div class="cv-sect">'+IC.files+' Documentos a anexar na Shift</div>';
 
   if(a.docs&&a.docs.length){
-    h+='<div class="cv-sect">'+IC.files+' Documentos a anexar na Shift</div>';
     for(var i=0;i<a.docs.length;i++){
-      h+='<div class="cv-file"><span>'+a.docs[i].n+'</span>'+IC.paperclip+'</div>';
-      if(a.docs[i].o)h+='<div class="cv-note">* '+a.docs[i].o+'</div>';
+      var d=a.docs[i];
+      h+='<div class="cv-docwrap">';
+      h+='<div class="cv-docbar"><span>'+d.n+'</span>'+IC.paperclip+'</div>';
+      if(d.ren)h+='<div class="cv-ren">* Renomear: <b>'+d.ren+'</b></div>';
+      if(d.obs)h+=bloco(d.obs);
+      h+='</div>';
     }
   }else{
-    h+='<div class="cv-sect">'+IC.files+' Documentos a anexar na Shift</div>';
-    h+='<div class="cv-note" style="margin-bottom:14px">Lista de anexos ainda não cadastrada para este convênio.</div>';
+    h+='<div class="cv-vazioanx">Lista de anexos ainda não cadastrada para este convênio.</div>';
   }
 
-  if(a.obs)h+='<div class="cv-rtxt">'+a.obs+'</div>';
-
-  if(a.faturamento===true){h+='<div class="cv-fat sim">* Guia enviada ao Faturamento</div>';}
-  else if(a.faturamento===false){h+='<div class="cv-fat nao">* Guia fica na Unidade</div>';}
+  if(a.faturamento===true)h+='<div class="cv-fat sim">* Guia enviada ao Faturamento</div>';
+  else if(a.faturamento===false)h+='<div class="cv-fat nao">* Guia fica na Unidade</div>';
 
   h+='<div class="cv-macts"><button class="cv-mb ret" id="cvModARet">RETORNAR</button><button class="cv-mb fec" id="cvModAFec">FECHAR</button></div>';
   $('cvModABody').innerHTML=h;
@@ -760,15 +785,15 @@ $('cvModRRet').addEventListener('click',function(){$('cvModR').className='cv-mod
 $('cvDate').addEventListener('change',function(){
   if(!this.value)return;
   if(!atual){alert('Selecione primeiro o convênio.');this.value='';return;}
+  var d=new Date(this.value+'T00:00:00');
   if(atual.validade===null||atual.validade==='sem'){
     $('cvDias').textContent='—';
-    $('cvD1').textContent=new Date(this.value+'T00:00:00').toLocaleDateString('pt-BR');
+    $('cvD1').textContent=d.toLocaleDateString('pt-BR');
     $('cvD2').textContent='Sem prazo';
     var b0=$('cvBadge');b0.textContent='SEM PRAZO';b0.className='cv-badge v';
     $('cvCalcRes').className='cv-res on';
     return;
   }
-  var d=new Date(this.value+'T00:00:00');
   var hoje=new Date();hoje.setHours(0,0,0,0);
   var dias=Math.floor((hoje-d)/86400000);
   var lim=new Date(d);lim.setDate(lim.getDate()+atual.validade);
@@ -783,9 +808,7 @@ $('cvDate').addEventListener('change',function(){
 
 /* ---------- reset ---------- */
 $('cvReset').addEventListener('click',function(){
-  atual=null;
-  inp.value='';
-  drop.className='cv-drop';
+  atual=null;inp.value='';drop.className='cv-drop';
   $('cvRes').style.display='none';
   $('cvDate').value='';
   $('cvCalcRes').className='cv-res';
