@@ -11,9 +11,13 @@ if(document.getElementById('cvOverlay')){document.getElementById('cvOverlay').st
                 (o campo r é opcional — quando existe aparece
                  o botão "ver restrição")
    naoAceita  : [{s:'CRN'}, {s:'COREN'}]
-   anexos     : null  -> botão fica desativado
-                {pedidos:[...], pedidosObs:'', capas:[...],
-                 capasObs:'', faturamento:true|false, obs:''}
+   validadeTxt: (opcional) sobrescreve o título do banner
+   validadeSub: (opcional) sobrescreve o subtítulo do banner
+   anexos     : null  -> botão "Documentos anexos na Shift" desativado
+                {docs:[{n:'NOME DO DOC', o:'regra/observação'}],
+                 obs:'observação geral dos anexos',
+                 faturamento:true  -> Guia enviada ao Faturamento
+                 faturamento:false -> Guia fica na Unidade}
    obs        : observação geral do convênio
    ============================================================ */
 
@@ -21,7 +25,8 @@ var CONV=[
 
 {nome:'AFFEGO',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'}],
- naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],
+ anexos:{docs:[{n:'PEDIDO MÉDICO'},{n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],faturamento:true}},
 
 {nome:'AFEB',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -32,8 +37,13 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
 
 {nome:'AMIL',validade:180,aceitaCopia:true,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito somente para os exames: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP e Hemo1.'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito desde que a indicação clínica seja compatível com a especialidade — exames pré-operatórios: Cre, Ure, Hem, TAP, TTPA, COA, EAS, Cultura, TGO, TGP e Hemo1. NÃO aceita pedido de CRO para COVID-19.'}],
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO',o:'Renomear: PM NOMEDOPACIENTECOMPLETO NºGUIA'},
+   {n:'ELEGIBILIDADE'}],
+  obs:'2 ou mais pedidos médicos, renomear assim: PM 1 NOMEDOPACIENTECOMPLETO NºGUIA / PM 2 NOMEDOPACIENTECOMPLETO NºGUIA / PM 3 NOMEDOPACIENTECOMPLETO NºGUIA',
+  faturamento:true}},
 
 {nome:'ASSEDF / VIDA CARD FIDELIDADE',validade:30,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -50,13 +60,11 @@ var CONV=[
 {nome:'BRADESCO',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
  naoAceita:[{s:'CRN'},{s:'COREN'}],
- anexos:{
-   pedidos:['PM NOMEDOCLIENTE','PM2 NOMEDOCLIENTE','PM3 NOMEDOCLIENTE'],
-   pedidosObs:'Obrigatório: use o formato "PM NOMEDOCLIENTE" para renomear. Adicione sufixo numérico para múltiplos pedidos.',
-   capas:['GU NOMEDOCLIENTE'],
-   capasObs:'Obrigatório: use o formato "GU NOMEDOCLIENTE" para renomear.',
-   faturamento:false
- }},
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO',o:'Renomear: PM NOMEDOPACIENTECOMPLETO'},
+   {n:'CAPA BRADESCO',o:'Renomear: GU NOMEDOPACIENTECOMPLETO'}],
+  obs:'Obrigatório que pedido e capa estejam renomeados. Havendo mais de um pedido médico: PM NOMEDOPACIENTECOMPLETO / PM2 NOMEDOPACIENTECOMPLETO / PM3 NOMEDOPACIENTECOMPLETO',
+  faturamento:false}},
 
 {nome:'BRASIL MED',validade:'sem',aceitaCopia:null,
  aceita:[],naoAceita:[],anexos:null,
@@ -76,6 +84,11 @@ var CONV=[
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
  naoAceita:[],anexos:null},
 
+{nome:'CAMED',validade:'sem',validadeTxt:'Regras de PM ainda não cadastradas',
+ validadeSub:'Por enquanto só está registrado o destino da guia.',
+ aceitaCopia:null,aceita:[],naoAceita:[],
+ anexos:{docs:[],faturamento:false}},
+
 {nome:'CAPESAÚDE',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
  naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
@@ -85,12 +98,21 @@ var CONV=[
  naoAceita:[{s:'COREN'}],anexos:null},
 
 {nome:'CASEMBRAPA',validade:90,aceitaCopia:false,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'},{s:'CRN',d:'Nutricionista',r:'CRN aceito com ressalvas — há restrição de exames.'}],
- naoAceita:[],anexos:null},
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'},{s:'CRN',d:'Nutricionista',r:'CRN aceito com ressalvas.'}],
+ naoAceita:[],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'CASSI',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[{n:'PEDIDO MÉDICO'}],faturamento:true}},
+
+{nome:'CASSI PERIÓDICO',validade:'sem',
+ validadeTxt:'Não aceitar encaminhamento vencido',
+ validadeSub:'Verificar a validade da guia da Cassi.',
+ aceitaCopia:null,aceita:[],naoAceita:[],
+ anexos:{docs:[{n:'GUIA PERIÓDICO CASSI'}],faturamento:true},
+ obs:'O beneficiário deve apresentar o encaminhamento da Cassi.'},
 
 {nome:'CIGNA',validade:60,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
@@ -113,7 +135,8 @@ var CONV=[
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},
          {s:'CRN',d:'Nutricionista',r:'CRN aceito somente se o pedido estiver em papel timbrado do CBMDF.'},
          {s:'COREN',d:'Enfermeiro',r:'COREN aceito somente se o pedido estiver em papel timbrado do CBMDF.'}],
- naoAceita:[],anexos:null},
+ naoAceita:[],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'E VIDA / ELETRONORTE / LUMINAR',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -133,7 +156,12 @@ var CONV=[
 
 {nome:'GEAP',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'},
+   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',o:'Documento com foto, frente e verso'}],
+  faturamento:true}},
 
 {nome:'HOSPITAL NAVAL / FUSMA',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
@@ -141,7 +169,12 @@ var CONV=[
 
 {nome:'INAS',validade:60,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'}],
- naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO',o:'Assinado conforme documento'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',o:'Assinado conforme documento'},
+   {n:'DOCUMENTAÇÃO PESSOAL + CARTEIRINHA',o:'Documento com foto, frente e verso. Se menor de idade, anexar também a documentação do responsável.'}],
+  faturamento:true}},
 
 {nome:'INTERMEDICA',validade:180,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'RMS',d:'Residente'}],
@@ -219,15 +252,22 @@ var CONV=[
 
 {nome:'PREVENT SENIOR',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'PROASA',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'REDE TOTAL / ADM SAÚDE',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'}],
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'RMS'},{s:'COREN'}],anexos:null},
+
+{nome:'RISA SERVIÇOS EM SAÚDE',validade:'sem',validadeTxt:'Regras de PM ainda não cadastradas',
+ validadeSub:'Por enquanto só está registrado o destino da guia.',
+ aceitaCopia:null,aceita:[],naoAceita:[],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'SAÚDE CAIXA',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
@@ -246,8 +286,14 @@ var CONV=[
  naoAceita:[{s:'COREN'}],anexos:null},
 
 {nome:'STF-MED',validade:60,aceitaCopia:true,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ copiaObs:'Aceita pedido impresso com complemento manuscrito, sem rasuras e com caneta da mesma cor da assinatura do médico.',
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},
+         {s:'CRN',d:'Nutricionista',r:'O CRN poderá solicitar apenas os seguintes exames laboratoriais: Hemograma completo; Proteínas totais e frações; Proteína ligadora de retinol; Triglicérides / colesterol total e frações; Glicemia, teste oral de tolerância à glicose, insulina, peptídeo C, hemoglobina glicada; Tiroxina total e livre, triiodotironina, globulina ligadora de tiroxina (TBG), TSH; Gasometria arterial; Ureia e creatinina; Sódio, cálcio total e iônico, potássio sérico, fósforo sérico, magnésio sérico; Ácido úrico, oxalato, citrato; TGO; TGP; GGT; Ferro sérico; Transferrina; Ferritina; Capacidade total de ligação do ferro; Vitamina B12; Ácido fólico; Vitamina D.'}],
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO',o:'Somente se houver autorização que alerta na Shift'}],
+  faturamento:true}},
 
 {nome:'STJ',validade:null,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -259,7 +305,8 @@ var CONV=[
 
 {nome:'SUL AMÉRICA',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito com ressalvas.'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[],faturamento:false}},
 
 {nome:'TJDFT',validade:30,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -289,7 +336,12 @@ var CONV=[
 
 {nome:'UNIMED SEGUROS',validade:null,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'},
+   {n:'GUIA DE AUTORIZAÇÃO UNIMED SEGUROS'}],
+  faturamento:true}},
 
 {nome:'UNITY',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:'CRO aceito com ressalvas.'}],
@@ -601,8 +653,8 @@ function render(c){
   var vb=$('cvVal'),vt=$('cvValT'),vs=$('cvValS');
   if(c.validade==='sem'){
     vb.className='cv-val sem';
-    vt.textContent='Sem regras de Pedido Médico';
-    vs.textContent='Veja a observação abaixo.';
+    vt.textContent=c.validadeTxt||'Sem regras de Pedido Médico';
+    vs.textContent=c.validadeSub||'Veja a observação abaixo.';
   }else if(c.validade===null){
     vb.className='cv-val indet';
     vt.textContent='Validade do PM: Indeterminada';
@@ -647,6 +699,7 @@ function render(c){
     eh+='<div class="cv-esp no"><span class="b">'+IC.x+'</span><span class="k">Não aceita</span><span class="lst"><span class="cv-nada">Aceita todas as especialidades</span></span></div>';
   }
   ex.innerHTML=eh;
+  ex.parentNode.style.display=(ac.length||na.length)?'flex':'none';
 
   var rb=ex.querySelectorAll('.cv-rbtn');
   for(var m=0;m<rb.length;m++){
@@ -677,23 +730,21 @@ $('cvAnx').addEventListener('click',function(){
   var a=atual.anexos,h='';
   $('cvModATit').textContent='Gerenciador de Documentos da Shift';
 
-  if(a.pedidos&&a.pedidos.length){
-    h+='<div class="cv-sect">'+IC.files+' Pedidos Médicos (Renomeados)</div>';
-    for(var i=0;i<a.pedidos.length;i++){
-      h+='<div class="cv-file"><span>'+a.pedidos[i]+'</span>'+IC.paperclip+'</div>';
+  if(a.docs&&a.docs.length){
+    h+='<div class="cv-sect">'+IC.files+' Documentos a anexar na Shift</div>';
+    for(var i=0;i<a.docs.length;i++){
+      h+='<div class="cv-file"><span>'+a.docs[i].n+'</span>'+IC.paperclip+'</div>';
+      if(a.docs[i].o)h+='<div class="cv-note">* '+a.docs[i].o+'</div>';
     }
-    if(a.pedidosObs)h+='<div class="cv-note">* '+a.pedidosObs+'</div>';
+  }else{
+    h+='<div class="cv-sect">'+IC.files+' Documentos a anexar na Shift</div>';
+    h+='<div class="cv-note" style="margin-bottom:14px">Lista de anexos ainda não cadastrada para este convênio.</div>';
   }
-  if(a.capas&&a.capas.length){
-    h+='<div class="cv-sect">'+IC.layers+' Capas de Convênio (Renomeadas)</div>';
-    for(var j=0;j<a.capas.length;j++){
-      h+='<div class="cv-file"><span>'+a.capas[j]+'</span>'+IC.paperclip+'</div>';
-    }
-    if(a.capasObs)h+='<div class="cv-note">* '+a.capasObs+'</div>';
-  }
+
+  if(a.obs)h+='<div class="cv-rtxt">'+a.obs+'</div>';
+
   if(a.faturamento===true){h+='<div class="cv-fat sim">* Guia enviada ao Faturamento</div>';}
   else if(a.faturamento===false){h+='<div class="cv-fat nao">* Guia fica na Unidade</div>';}
-  if(a.obs)h+='<div class="cv-rtxt">'+a.obs+'</div>';
 
   h+='<div class="cv-macts"><button class="cv-mb ret" id="cvModARet">RETORNAR</button><button class="cv-mb fec" id="cvModAFec">FECHAR</button></div>';
   $('cvModABody').innerHTML=h;
