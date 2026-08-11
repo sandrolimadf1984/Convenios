@@ -264,8 +264,74 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
 
 {nome:'POSTAL SAÚDE / CORREIOS',validade:30,aceitaCopia:false,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ copiaObs:{t:'Regras específicas do pedido médico no Postal Saúde:',
+           l:['Pedido médico digitalizado com acréscimo a caneta: só é aceito o que está digitalizado. O acréscimo a caneta não pode ser realizado.',
+              'Aceita pedido médico do SUS com inclusão de caneta.'],
+           a:'Em hipótese alguma cadastrar exames acrescentados a caneta.'},
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},
+         {s:'CRN',d:'Nutricionista',r:{
+   t:'Avaliação do estado geral do paciente. O CRN poderá solicitar apenas os exames abaixo:',
+   l:['Hemograma completo',
+      'Albumina sérica',
+      'Cálcio',
+      'Cálcio iônico',
+      'Zinco sérico',
+      'Zinco eritrocitário',
+      'Magnésio',
+      'Cromo',
+      'Ácido fólico',
+      'Cortisol',
+      'EAS',
+      'Coprológico funcional',
+      'Pesquisa de sangue oculto',
+      'Fósforo',
+      'Potássio',
+      'Sódio',
+      'Ferro',
+      'Transferrina',
+      'Ferritina sérica',
+      'Saturação de transferrina',
+      'TODAS as vitaminas',
+      'Glicemia em jejum',
+      'Hemoglobina glicada',
+      'Frutosamina',
+      'Curva glicêmica e insulínica',
+      'Insulina basal (HOMA IR e beta)',
+      'Glicemia pós-prandial',
+      'Teste de tolerância à lactose',
+      'Teste de intolerância alimentar (para 220 alimentos)',
+      'IGA, IGG e IGE para alimentos',
+      'Anti-endomísio (IGA)',
+      'Anti-gliadina (IGA, IGG)',
+      'Anti-transglutaminase (IGA)',
+      'IGA e IGG totais',
+      'Perfil lipídico',
+      'PCR ultrassensível',
+      'APO a',
+      'APO b',
+      'Lipoproteína A',
+      'Homocisteína',
+      'Creatinina sérica',
+      'Sódio sérico',
+      'Potássio sérico',
+      'Uréia',
+      'PTH',
+      'TGO',
+      'TGP',
+      'Gama GT',
+      'Fosfatase alcalina',
+      'Minerais e mineralograma',
+      'T3',
+      'T4 livre e total',
+      'TSH',
+      'Anti TPO',
+      'Anticorpos antitireoglobulinas']}}],
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],
+  faturamento:true}},
 
 {nome:'PREVENT SENIOR',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -346,7 +412,11 @@ var CONV=[
 
 {nome:'TRE',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],
+  faturamento:true}},
 
 {nome:'TRF',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},
@@ -356,7 +426,12 @@ var CONV=[
 
 {nome:'TRT',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],
+  faturamento:true}},
 
 {nome:'TST',validade:30,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -520,7 +595,7 @@ var CSS=''
 /* ---- MODAIS ---- */
 +'#cvOverlay .cv-mod{position:absolute;inset:0;background:rgba(15,25,45,.5);display:none;align-items:center;justify-content:center;padding:18px;border-radius:22px;}'
 +'#cvOverlay .cv-mod.on{display:flex;}'
-+'#cvOverlay .cv-mbox{width:100%;max-width:400px;max-height:100%;overflow-y:auto;background:#fff;border-radius:15px;box-shadow:0 18px 46px rgba(0,0,0,.35);}'
++'#cvOverlay .cv-mbox{width:100%;max-width:418px;max-height:100%;overflow-y:auto;background:#fff;border-radius:15px;box-shadow:0 18px 46px rgba(0,0,0,.35);}'
 +'#cvOverlay .cv-mhead{display:flex;align-items:center;gap:9px;padding:13px 15px;border-bottom:1.4px solid #e6ebf3;position:sticky;top:0;background:#fff;border-radius:15px 15px 0 0;}'
 +'#cvOverlay .cv-mhead h3{flex:1;font-size:13.5px;font-weight:800;color:#22304c;}'
 +'#cvOverlay .cv-mx{background:none;border:0;color:#8b93a4;font-size:19px;line-height:1;cursor:pointer;font-family:inherit;padding:0 2px;}'
@@ -542,6 +617,8 @@ var CSS=''
 +'#cvOverlay .cv-dobs ul{list-style:none;margin:6px 0 0 0;padding:0;}'
 +'#cvOverlay .cv-dobs li{font-size:11.5px;color:#4a3a12;font-weight:700;line-height:1.75;padding-left:12px;position:relative;letter-spacing:.2px;}'
 +'#cvOverlay .cv-dobs li:before{content:"";position:absolute;left:1px;top:9px;width:4px;height:4px;border-radius:50%;background:#c9922a;}'
++'#cvOverlay .cv-dobs ul.cols{column-count:2;column-gap:16px;}'
++'#cvOverlay .cv-dobs ul.cols li{break-inside:avoid;-webkit-column-break-inside:avoid;font-size:10.8px;line-height:1.6;font-weight:600;}'
 +'#cvOverlay .cv-dobs .al{margin-top:8px;padding:7px 10px;border-radius:7px;background:#fdecef;color:#a01a30;font-size:11px;font-weight:700;line-height:1.5;}'
 +'#cvOverlay .cv-docwrap{margin-bottom:14px;}'
 +'#cvOverlay .cv-fat{padding:11px 12px;border-radius:10px;font-size:12.5px;font-weight:800;text-align:center;margin:4px 0 13px;}'
@@ -611,7 +688,7 @@ function bloco(o){
   if(typeof o==='string'){h+='<p>'+o+'</p>';}
   else{
     if(o.t)h+='<p>'+o.t+'</p>';
-    if(o.l&&o.l.length){h+='<ul>';for(var i=0;i<o.l.length;i++){h+='<li>'+o.l[i]+'</li>';}h+='</ul>';}
+    if(o.l&&o.l.length){h+='<ul'+(o.l.length>12?' class="cols"':'')+'>';for(var i=0;i<o.l.length;i++){h+='<li>'+o.l[i]+'</li>';}h+='</ul>';}
     if(o.a)h+='<div class="al">'+o.a+'</div>';
   }
   return h+'</div>';
