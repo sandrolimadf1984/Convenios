@@ -3,28 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Verificador de Convenios &mdash; Sabin</title>
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Verificador de Conv&ecirc;nios &mdash; Sabin</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#e8f0fe,#f0f4f8);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-.card{background:#fff;border-radius:20px;box-shadow:0 12px 44px rgba(20,40,80,.14);max-width:600px;width:100%;overflow:hidden;}
-.header{background:linear-gradient(120deg,#1b52ad,#1877d8);color:#fff;padding:28px 32px;text-align:center;}
-.icon{font-size:2.6rem;margin-bottom:8px;}
-h1{font-size:1.35rem;font-weight:800;letter-spacing:.5px;}
-.header p{font-size:.88rem;opacity:.85;margin-top:6px;}
-.body{padding:30px 32px;}
-.step{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
-.num{background:#1b52ad;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;flex-shrink:0;margin-top:1px;}
-.step h3{font-size:.98rem;font-weight:700;color:#1a2a4a;margin-bottom:3px;}
-.step p{font-size:.86rem;color:#5b6880;line-height:1.55;}
-.code-box{background:#16213e;color:#9fd0ff;border-radius:12px;padding:14px;font-family:Consolas,monospace;font-size:.7rem;word-break:break-all;line-height:1.5;max-height:120px;overflow-y:auto;border:1.5px solid #2d7dff;margin:10px 0;}
-.btn{background:linear-gradient(135deg,#1b52ad,#1877d8);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;width:100%;box-shadow:0 4px 14px rgba(27,82,173,.28);}
-.btn:hover{background:linear-gradient(135deg,#1877d8,#2a8ae8);}
-.demo{background:#f6f9fd;border-radius:11px;padding:14px 16px;font-size:.85rem;color:#5b6880;border-left:4px solid #21a145;margin-top:14px;line-height:1.65;}
-.demo b{color:#15662d;}
-.aviso{background:#fff8e6;border-radius:11px;padding:13px 16px;font-size:.82rem;color:#7a5a11;border-left:4px solid #eea93a;margin-top:12px;line-height:1.6;}
-.divider{height:1px;background:#eef2f7;margin:20px 0;}
-.foot{text-align:center;font-size:.78rem;color:#a5b0c2;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#eef2f7;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:#fff;border-radius:16px;box-shadow:0 10px 34px rgba(20,40,80,.12);max-width:520px;width:100%;overflow:hidden}
+.header{background:linear-gradient(135deg,#1b52ad,#1877d8);color:#fff;padding:26px 30px;text-align:center}
+.icon{font-size:2.4rem;margin-bottom:6px;line-height:1}
+h1{font-size:1.4rem;font-weight:800}
+.header p{font-size:.85rem;font-weight:600;opacity:.9;margin-top:6px}
+.body{padding:28px 30px}
+.step{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.num{background:#1668ce;color:#fff;border-radius:50%;width:29px;height:29px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.88rem;flex-shrink:0;margin-top:1px}
+.step h3{font-size:1rem;font-weight:800;color:#1a2a4a;margin-bottom:5px}
+.step p{font-size:.88rem;color:#6b7891;line-height:1.6}
+.drag{background:#f4f8fe;border:2px dashed #7fa9e4;border-radius:14px;padding:26px 18px;text-align:center;margin-top:16px}
+.drag .lbl{font-size:.87rem;color:#4a5a75;margin-bottom:16px}
+.bm{display:inline-block;background:linear-gradient(135deg,#1b52ad,#1877d8);color:#fff!important;padding:14px 30px;border-radius:12px;font-size:1.02rem;font-weight:700;text-decoration:none!important;cursor:grab;box-shadow:0 5px 16px rgba(27,82,173,.35);user-select:none}
+.bm:hover{background:linear-gradient(135deg,#1877d8,#2a8ae8)}
+.bm:active{cursor:grabbing}
+.hint{margin-top:16px;font-size:.84rem;color:#8b93a4;line-height:1.5}
+.demo{background:#f1faf3;border-left:4px solid #21a145;border-radius:9px;padding:15px 17px;font-size:.87rem;color:#4a6b55;margin-top:15px;line-height:1.75}
+.demo b{color:#15662d}
+.hr{height:1px;background:#eef2f7;margin:6px 0 16px}
+.foot{text-align:center;font-size:.82rem;color:#a5b0c2}
+details{margin-top:14px}
+summary{font-size:.78rem;color:#9aa4b6;cursor:pointer;text-align:center;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary:hover{color:#1668ce}
+.code{background:#16213e;color:#9fd0ff;border-radius:9px;padding:11px;font-family:Consolas,monospace;font-size:.64rem;word-break:break-all;line-height:1.5;max-height:80px;overflow-y:auto;margin-top:9px}
+.btn{margin-top:8px;background:#eef4fd;color:#1152a8;border:1.4px solid #b9d2f2;padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;width:100%;font-family:inherit}
+.btn:hover{background:#dfeaf9}
+.cred{text-align:right;margin-top:10px;font-size:.72rem;font-weight:800;color:#a08a45}
 </style>
 </head>
 <body>
@@ -38,52 +49,50 @@ h1{font-size:1.35rem;font-weight:800;letter-spacing:.5px;}
 
     <div class="step">
       <div class="num">1</div>
-      <div style="flex:1">
-        <h3>Copie o c&oacute;digo abaixo</h3>
-        <p>Clique no bot&atilde;o e o c&oacute;digo vai para a &aacute;rea de transfer&ecirc;ncia.</p>
-        <div class="code-box" id="code">javascript:(function(){var _p0="aHR0cHM6Ly9zYW5kcm9saW1h",_p1="ZGYxOTg0LmdpdGh1Yi5pby9D",_p2="b252ZW5pb3MvY29udmVuaW9z",_p3="Mi5qcw==";fetch(atob(_p0+_p1+_p2+_p3)+"?v="+Date.now()).then(r=>{if(!r.ok)throw new Error("Erro ao carregar!");return r.text()}).then(c=>eval(c)).catch(e=>alert(e.message));})();</div>
-        <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('code').innerText);this.innerText='&#9989; Copiado!'">&#128203; Copiar c&oacute;digo</button>
+      <div>
+        <h3>Mostre a barra de favoritos</h3>
+        <p>Pressione <b>Ctrl + Shift + B</b> no Chrome para exibir a barra de favoritos.</p>
       </div>
     </div>
 
     <div class="step">
       <div class="num">2</div>
-      <div>
-        <h3>Mostre a barra de favoritos</h3>
-        <p>Pressione <b>Ctrl + Shift + B</b> no Chrome.</p>
+      <div style="flex:1">
+        <h3>Arraste o bot&atilde;o para a barra de favoritos</h3>
+        <p>Segure o bot&atilde;o abaixo com o mouse e arraste at&eacute; a barra no topo do Chrome.</p>
+        <div class="drag">
+          <div class="lbl">&#11015; Arraste este bot&atilde;o para a barra de favoritos &#11015;</div>
+          <a class="bm" href="javascript:(function(){var _p0="aHR0cHM6Ly9zYW5kcm9saW1h",_p1="ZGYxOTg0LmdpdGh1Yi5pby9D",_p2="b252ZW5pb3MvY29udmVuaW9z",_p3="Mi5qcw==";fetch(atob(_p0+_p1+_p2+_p3)+"?v="+Date.now()).then(r=>{if(!r.ok)throw new Error("Erro ao carregar!");return r.text()}).then(c=>eval(c)).catch(e=>alert(e.message));})();">&#128203; Conv&ecirc;nios</a>
+          <div class="hint">&#128070; Clique e segure &rarr; arraste para cima at&eacute; a barra</div>
+        </div>
       </div>
     </div>
 
     <div class="step">
       <div class="num">3</div>
       <div>
-        <h3>Crie o favorito</h3>
-        <p>Clique com o <b>bot&atilde;o direito</b> na barra de favoritos &rarr; <b>Adicionar p&aacute;gina...</b><br>
-        No campo <b>Nome</b> coloque: <b>&#128203; Conv&ecirc;nios</b><br>
-        No campo <b>URL</b> cole o c&oacute;digo copiado &rarr; <b>Salvar</b></p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="num">4</div>
-      <div>
-        <h3>Pronto! Use quando precisar</h3>
-        <p>Em qualquer portal, clique em <b>&#128203; Conv&ecirc;nios</b> na barra.</p>
+        <h3>Pronto! Clique no favorito para usar</h3>
+        <p>Abra qualquer portal de autoriza&ccedil;&atilde;o e clique em <b>&#128203; Conv&ecirc;nios</b> na barra.</p>
         <div class="demo">
-          <b>&#9989; O que a ferramenta mostra:</b><br>
-          Validade do pedido m&eacute;dico e se aceita c&oacute;pia<br>
-          Quais conselhos assina (CRM, CRN, CRO, COREN, RMS) e as restri&ccedil;&otilde;es<br>
-          Documentos que precisam ser anexados na Shift<br>
-          Calculadora que diz se o pedido est&aacute; V&Aacute;LIDO ou VENCIDO
-        </div>
-        <div class="aviso">
-          &#9888;&#65039; <b>Importante:</b> instale por este m&eacute;todo (colar no campo URL). Assim, toda atualiza&ccedil;&atilde;o feita nas regras dos conv&ecirc;nios aparece automaticamente para voc&ecirc;, sem precisar reinstalar nada.
+          <b>&#9989; Como funciona:</b><br>
+          Clique no favorito &rarr; a ferramenta abre por cima do portal<br>
+          Digite o conv&ecirc;nio &rarr; veja validade, ressalvas e anexos da Shift<br>
+          Informe a data do pedido &rarr; diz se est&aacute; <b>V&Aacute;LIDO</b> ou <b>VENCIDO</b><br>
+          Clique <b>FECHAR</b> para sair.
         </div>
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="hr"></div>
     <div class="foot">Desenvolvido para uso interno &middot; Sabin Bras&iacute;lia</div>
+
+    <details>
+      <summary>N&atilde;o conseguiu arrastar? Clique aqui</summary>
+      <div class="code" id="code">javascript:(function(){var _p0="aHR0cHM6Ly9zYW5kcm9saW1h",_p1="ZGYxOTg0LmdpdGh1Yi5pby9D",_p2="b252ZW5pb3MvY29udmVuaW9z",_p3="Mi5qcw==";fetch(atob(_p0+_p1+_p2+_p3)+"?v="+Date.now()).then(r=>{if(!r.ok)throw new Error("Erro ao carregar!");return r.text()}).then(c=>eval(c)).catch(e=>alert(e.message));})();</div>
+      <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('code').innerText);this.innerText='&#9989; Copiado! Bot&atilde;o direito na barra &rarr; Adicionar p&aacute;gina &rarr; cole no campo URL'">Copiar c&oacute;digo</button>
+    </details>
+
+    <div class="cred">criado por Sandro de Lima Pereira</div>
   </div>
 </div>
 </body>
