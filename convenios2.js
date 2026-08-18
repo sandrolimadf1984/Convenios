@@ -81,19 +81,23 @@ var CONV=[
  aceita:[],naoAceita:[],anexos:null,
  obs:'Não há regras de pedido médico. O paciente traz e assina o encaminhamento.'},
 
-{nome:'BRB',validade:30,aceitaCopia:'parcial',
- copiaObs:'Cópia de pedido médico aceita com ressalvas.',
+{nome:'BRB',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:{
    t:'CRO aceito somente para os exames abaixo:',
    l:['HEM, GLI, HBGLI, URE, NA, K, TGO, TGP, GGT, BTF, PTF, CULTSEC, EAS, EPF, TC, TS e TAP.']}}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],
+  faturamento:true}},
 
 {nome:'CAESAN',validade:90,aceitaCopia:'parcial',
  copiaObs:'Não aceita cópia de pedido externo. Só é aceita se o pedido for da própria Caesan.',
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
  naoAceita:[],anexos:null},
 
-{nome:'CÂMARA DOS DEPUTADOS / PRÓ-SAÚDE',validade:30,aceitaCopia:true,
+{nome:'CÂMARA DOS DEPUTADOS / PRÓ-SAÚDE',validade:30,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'}],
  naoAceita:[],anexos:null},
 
@@ -230,8 +234,24 @@ var CONV=[
  naoAceita:[{s:'CRN'},{s:'CRO'},{s:'COREN'}],anexos:null},
 
 {nome:'OMINT SAÚDE',validade:90,aceitaCopia:true,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:{
+   t:'CRO aceito somente para Cirurgiões-Dentistas. São aceitos apenas os exames autorizados para essa especialidade:',
+   l:['Biópsia',
+      'Sorologia para Hepatite A, B e C',
+      'HIV',
+      'Hemograma',
+      'Coagulograma',
+      'CD4 e CD8',
+      'Hbgli',
+      'Glicose',
+      'Fosfatase ácida',
+      'Fosfatase alcalina',
+      'Culturas de punção de líquidos de lesões maxilo-mandibulares']}}],
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'}],
+  faturamento:true}},
 
 {nome:'PASA VALE',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'},{s:'RMS',d:'Residente'}],
