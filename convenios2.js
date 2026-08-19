@@ -81,7 +81,7 @@ var CONV=[
  aceita:[],naoAceita:[],anexos:null,
  obs:'Não há regras de pedido médico. O paciente traz e assina o encaminhamento.'},
 
-{nome:'BRB',validade:30,aceitaCopia:true,
+{nome:'BRB',validade:30,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico',r:{
    t:'CRO aceito somente para os exames abaixo:',
    l:['HEM, GLI, HBGLI, URE, NA, K, TGO, TGP, GGT, BTF, PTF, CULTSEC, EAS, EPF, TC, TS e TAP.']}}],
