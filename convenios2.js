@@ -640,11 +640,21 @@ var CSS=''
 +'#cvOverlay .cv-res{display:none;margin-top:11px;}'
 +'#cvOverlay .cv-res.on{display:block;}'
 +'#cvOverlay .cv-resrow{display:flex;align-items:center;gap:9px;}'
-+'#cvOverlay .cv-dias{flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.4px solid #dde4ee;border-radius:11px;font-size:12.5px;color:#3c4a66;background:#f8fafd;}'
++'#cvOverlay .cv-dias{flex:1;padding:10px 12px;border:1.4px solid #dde4ee;border-radius:11px;font-size:12px;color:#3c4a66;background:#f8fafd;line-height:1.5;}'
 +'#cvOverlay .cv-dias b{color:#1152a8;font-weight:800;}'
++'#cvOverlay .cv-dias b.hoje{color:#1f8a3c;letter-spacing:.3px;}'
++'#cvOverlay .cv-dias b.cad{color:#1152a8;letter-spacing:.3px;}'
++'#cvOverlay .cv-cadbloco{display:none;margin-top:13px;padding-top:13px;border-top:1.5px dashed #d5dde9;}'
++'#cvOverlay .cv-cadbloco.on{display:block;}'
++'#cvOverlay .cv-cadline{display:flex;align-items:center;gap:11px;}'
++'#cvOverlay .cv-cadlbl{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#3c4a66;white-space:nowrap;}'
++'#cvOverlay .cv-cadlbl svg{font-size:15px;color:#1152a8;}'
++'#cvOverlay .cv-cadres{display:none;margin-top:10px;}'
++'#cvOverlay .cv-cadres.on{display:block;}'
 +'#cvOverlay .cv-badge{padding:10px 18px;border-radius:11px;font-size:13px;font-weight:900;letter-spacing:1px;display:flex;align-items:center;justify-content:center;min-width:100px;}'
 +'#cvOverlay .cv-badge.v{background:#eaf8ee;color:#15662d;border:1.7px solid #46b866;}'
 +'#cvOverlay .cv-badge.x{background:#fdecef;color:#a01a30;border:1.7px solid #e0364f;}'
++'#cvOverlay .cv-badge.n{background:#fff5e0;color:#a8690a;border:1.7px solid #e79a1f;font-size:11px;letter-spacing:.5px;}'
 +'#cvOverlay .cv-datas{display:flex;gap:9px;margin-top:9px;}'
 +'#cvOverlay .cv-dbox{flex:1;padding:9px 12px;border-radius:11px;background:#f2f6fb;border:1.3px solid #e0e8f3;}'
 +'#cvOverlay .cv-dbox span{display:block;font-size:9.5px;font-weight:700;color:#8b93a4;letter-spacing:.2px;}'
@@ -732,8 +742,12 @@ ov.innerHTML=''
 +'   <div class="cv-calch"><span class="ci">'+IC.calc+'</span>Calculadora de validade do Pedido Médico</div>'
 +'   <div class="cv-dline"><span class="cv-dlbl">'+IC.cal+' Data do pedido:</span><input type="date" class="cv-date" id="cvDate"></div>'
 +'   <div class="cv-res" id="cvCalcRes">'
-+'     <div class="cv-resrow"><div class="cv-dias">Pedido tem <b id="cvDias">—</b></div><div class="cv-badge" id="cvBadge">—</div></div>'
++'     <div class="cv-resrow"><div class="cv-dias">De acordo com o dia de <b class="hoje">HOJE</b>, o pedido tem <b id="cvDias">—</b></div><div class="cv-badge" id="cvBadge">—</div></div>'
 +'     <div class="cv-datas"><div class="cv-dbox"><span>Data do pedido recebido</span><strong id="cvD1">—</strong></div><div class="cv-dbox"><span>Data limite de validade</span><strong id="cvD2">—</strong></div></div>'
++'     <div class="cv-cadbloco on" id="cvCadBloco">'
++'       <div class="cv-cadline"><span class="cv-cadlbl">'+IC.cal+' Data do cadastro:</span><input type="date" class="cv-date" id="cvDateCad"></div>'
++'       <div class="cv-cadres" id="cvCadRes"><div class="cv-resrow"><div class="cv-dias" id="cvCadTxt">—</div><div class="cv-badge" id="cvCadBadge">—</div></div></div>'
++'     </div>'
 +'   </div>'
 +'   <div class="cv-acts"><button class="cv-b r" id="cvReset">'+IC.reset+' RESETAR <small>Zerar tudo</small></button><button class="cv-b f" id="cvFechar">'+IC.x+' FECHAR <small>Fecha a ferramenta</small></button></div>'
 +'   <div class="cv-foot"><span class="fi">'+IC.info+'</span><p>As informações podem variar conforme atualização das operadoras.<br>Sempre consulte as regras oficiais do convênio.</p><span class="fs">'+IC.shield+'</span></div>'
@@ -894,7 +908,9 @@ function render(c){
   else{ob.className='cv-obs';ob.textContent='';}
 
   $('cvDate').value='';
+  $('cvDateCad').value='';
   $('cvCalcRes').className='cv-res';
+  $('cvCadRes').className='cv-cadres';
 }
 
 /* ---------- modal de anexos ---------- */
@@ -932,28 +948,85 @@ $('cvModRX').addEventListener('click',function(){$('cvModR').className='cv-mod';
 $('cvModRRet').addEventListener('click',function(){$('cvModR').className='cv-mod';});
 
 /* ---------- calculadora ---------- */
-$('cvDate').addEventListener('change',function(){
-  if(!this.value)return;
-  if(!atual){alert('Selecione primeiro o convênio.');this.value='';return;}
-  var d=new Date(this.value+'T00:00:00');
+function fmt(d){return d.toLocaleDateString('pt-BR');}
+function dataDe(v){return new Date(v+'T00:00:00');}
+
+/* calcula em relacao ao dia de HOJE */
+function calcularHoje(){
+  var v=$('cvDate').value;
+  if(!v||!atual)return;
+  var d=dataDe(v);
+  $('cvD1').textContent=fmt(d);
+
   if(atual.validade===null||atual.validade==='sem'){
-    $('cvDias').textContent='—';
-    $('cvD1').textContent=d.toLocaleDateString('pt-BR');
+    $('cvDias').textContent='sem prazo definido';
     $('cvD2').textContent='Sem prazo';
     var b0=$('cvBadge');b0.textContent='SEM PRAZO';b0.className='cv-badge v';
     $('cvCalcRes').className='cv-res on';
+    calcularCadastro();
     return;
   }
+
   var hoje=new Date();hoje.setHours(0,0,0,0);
   var dias=Math.floor((hoje-d)/86400000);
   var lim=new Date(d);lim.setDate(lim.getDate()+atual.validade);
+
   $('cvDias').textContent=dias+' dias';
-  $('cvD1').textContent=d.toLocaleDateString('pt-BR');
-  $('cvD2').textContent=lim.toLocaleDateString('pt-BR');
+  $('cvD2').textContent=fmt(lim);
+
   var b=$('cvBadge');
-  if(dias<=atual.validade&&dias>=0){b.textContent='VÁLIDO';b.className='cv-badge v';}
+  if(dias>=0&&dias<=atual.validade){b.textContent='VÁLIDO';b.className='cv-badge v';}
+  else if(dias<0){b.textContent='VERIFIQUE';b.className='cv-badge n';}
   else{b.textContent='VENCIDO';b.className='cv-badge x';}
+
   $('cvCalcRes').className='cv-res on';
+  calcularCadastro();
+}
+
+/* calcula em relacao a DATA DO CADASTRO */
+function calcularCadastro(){
+  var vp=$('cvDate').value, vc=$('cvDateCad').value;
+  var cx=$('cvCadRes'), txt=$('cvCadTxt'), bg=$('cvCadBadge');
+
+  if(!vp||!vc||!atual){cx.className='cv-cadres';return;}
+
+  var dp=dataDe(vp), dc=dataDe(vc);
+  var hoje=new Date();hoje.setHours(0,0,0,0);
+  var ehHoje=(dc.getTime()===hoje.getTime());
+  var verbo=ehHoje?'tem':'tinha';
+
+  if(atual.validade===null||atual.validade==='sem'){
+    txt.innerHTML='De acordo com a data do <b class="cad">CADASTRO</b>, este convênio não define prazo de validade.';
+    bg.textContent='SEM PRAZO';bg.className='cv-badge v';
+    cx.className='cv-cadres on';
+    return;
+  }
+
+  var dias=Math.floor((dc-dp)/86400000);
+
+  if(dias<0){
+    txt.innerHTML='A data do cadastro é <b>anterior</b> à data do pedido médico. Confira as duas datas.';
+    bg.textContent='VERIFIQUE';bg.className='cv-badge n';
+    cx.className='cv-cadres on';
+    return;
+  }
+
+  txt.innerHTML='De acordo com a data do <b class="cad">CADASTRO</b>, o pedido '+verbo+' <b>'+dias+' dias</b>';
+  if(dias<=atual.validade){bg.textContent='VÁLIDO';bg.className='cv-badge v';}
+  else{bg.textContent='VENCIDO';bg.className='cv-badge x';}
+  cx.className='cv-cadres on';
+}
+
+$('cvDate').addEventListener('change',function(){
+  if(!this.value)return;
+  if(!atual){alert('Selecione primeiro o convênio.');this.value='';return;}
+  calcularHoje();
+});
+
+$('cvDateCad').addEventListener('change',function(){
+  if(!atual){alert('Selecione primeiro o convênio.');this.value='';return;}
+  if(!$('cvDate').value){alert('Informe primeiro a data do pedido médico.');this.value='';return;}
+  calcularCadastro();
 });
 
 /* ---------- reset ---------- */
@@ -961,7 +1034,9 @@ $('cvReset').addEventListener('click',function(){
   atual=null;inp.value='';drop.className='cv-drop';
   $('cvRes').style.display='none';
   $('cvDate').value='';
+  $('cvDateCad').value='';
   $('cvCalcRes').className='cv-res';
+  $('cvCadRes').className='cv-cadres';
   $('cvModA').className='cv-mod';
   $('cvModR').className='cv-mod';
   inp.focus();
