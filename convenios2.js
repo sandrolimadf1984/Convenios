@@ -153,9 +153,18 @@ var CONV=[
  anexos:{docs:[{n:'PEDIDO MÉDICO'}],faturamento:true}},
 
 {nome:'CASEMBRAPA',validade:90,aceitaCopia:false,
- aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'},{s:'CRN',d:'Nutricionista',r:'CRN aceito com ressalvas.'}],
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},{s:'COREN',d:'Enfermeiro'},
+         {s:'CRN',d:'Nutricionista',r:{
+   t:'Pedido de Nutricionista aceito somente para os exames abaixo:',
+   l:['Hemograma completo','Lipidograma completo','Glicemia','Insulina basal',
+      'Fosfatase alcalina','Gama GT','Amilase sérica',
+      'Alanina aminotransferase (ALT)','Aspartato aminotransferase (AST)',
+      'Proteínas totais e frações','Ureia','Creatinina','Ácido úrico',
+      'Ferro','Ferritina','Transferrina','Vitamina D3','Vitamina B12',
+      'Zinco sérico','Ácido fólico','Creatina quinase (CK)','Homocisteína',
+      'Proteína C reativa','TSH','T4 livre','EAS']}}],
  naoAceita:[],
- anexos:{docs:[],faturamento:false}},
+ anexos:{docs:[{n:'PEDIDO MÉDICO'}],faturamento:false}},
 
 {nome:'CASSI',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
@@ -176,15 +185,32 @@ var CONV=[
 
 {nome:'CNU UNIMED',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'CRN'},{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'GUIA UNIMED'}],
+  faturamento:true}},
 
 {nome:'CODEVASF',validade:30,aceitaCopia:true,
+ copiaObs:{t:'Aceita cópia, mas há regras obrigatórias na O.S.:',
+           l:['É OBRIGATÓRIO anexar o pedido médico na O.S., com data e assinatura do paciente',
+              'Anexar também a autorização, quando houver solicitação'],
+           a:'Devolver o pedido médico ORIGINAL ao paciente.'},
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO',ren:'PM NOMEDOPACIENTE'},
+   {n:'GUIA DE AUTORIZAÇÃO',ren:'AUT NOMEDOPACIENTE',
+    obs:'Anexar somente se houver autorização.'}],
+  faturamento:false}},
 
 {nome:'CONAB',validade:30,aceitaCopia:true,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],anexos:null},
+ naoAceita:[{s:'COREN'}],
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'ELEGIBILIDADE'}],
+  faturamento:true}},
 
 {nome:'CORPO DE BOMBEIROS',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'},
@@ -408,7 +434,10 @@ var CONV=[
 {nome:'PROASA',validade:90,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
  naoAceita:[{s:'COREN'}],
- anexos:{docs:[],faturamento:false}},
+ anexos:{docs:[
+   {n:'PEDIDO MÉDICO'},
+   {n:'GUIA DE AUTORIZAÇÃO DO CONVÊNIO'}],
+  faturamento:false}},
 
 {nome:'REDE TOTAL / ADM SAÚDE',validade:60,aceitaCopia:false,
  aceita:[{s:'CRM',d:'Médico'}],
