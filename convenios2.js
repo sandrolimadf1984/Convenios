@@ -330,8 +330,8 @@ var CONV=[
               'Depois enviar o número da guia autorizada e o pedido em anexo para o e-mail adm_callcenter@medsenior.com.br',
               'Aguardar a resposta autorizando o atendimento'],
            a:'IMPORTANTE: imprimir e grampear a resposta do e-mail junto com as guias enviadas para o faturamento, e anexar na Shift.'},
- aceita:[{s:'CRM',d:'Médico'},{s:'CRN',d:'Nutricionista'},{s:'CRO',d:'Dentista/Biomédico'}],
- naoAceita:[{s:'COREN'}],
+ aceita:[{s:'CRM',d:'Médico'},{s:'CRO',d:'Dentista/Biomédico'}],
+ naoAceita:[{s:'CRN'},{s:'COREN'}],
  anexos:{docs:[
    {n:'PEDIDO MÉDICO'},
    {n:'COMPROVANTE MÉDICO HOSPITALAR'},
